@@ -16,6 +16,6 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0",
-    "data-blob": "link:data-blob"
+    "@dobuki/data-blob": "link:@dobuki/data-blob"
   }
 }
