@@ -1,28 +1,15 @@
-# bun-template
+# data-blob
 
-[![npm version](https://badge.fury.io/js/bun-template.svg)](https://www.npmjs.com/package/bun-template)
+[![npm version](https://badge.fury.io/js/data-blob.svg)](https://www.npmjs.com/package/data-blob)
 
-Bun template for creating projects using bunjs
+Data Blob
 
-![icon](https://jacklehamster.github.io/bun-template/icon.png)
-
-## Install bun
-
-<https://bun.sh/>
-
-```bash
-curl -fsSL https://bun.sh/install | bash
-```
-
-## Commands
-
-- **start**: "bun run index.ts",
-- **bundle**: "bun run bundler/bundler.ts",
+![icon](https://jacklehamster.github.io/data-blob/icon.png)
 
 ## Run example
 
-[https://jacklehamster.github.io/bun-template/example/](https://jacklehamster.github.io/bun-template/example/)
+[https://jacklehamster.github.io/data-blob/example/](https://jacklehamster.github.io/data-blob/example/)
 
 ## Github Source
 
-[https://github.com/jacklehamster/bun-template/](https://github.com/jacklehamster/bun-template/)
+[https://github.com/jacklehamster/data-blob/](https://github.com/jacklehamster/data-blob/)
