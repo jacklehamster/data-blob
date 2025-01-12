@@ -1,7 +1,7 @@
 {
   "name": "data-blob",
   "module": "src/index.ts",
-  "description": "Data blob",
+  "description": "Dump all your data, objects, images, sound into a Blob",
   "version": "1.0.0",
   "keywords": [
     "bun",
@@ -15,11 +15,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:jacklehamster/bun-template.git"
+    "url": "git@github.com:jacklehamster/data-blob.git"
   },
-  "homepage": "https://jacklehamster.github.io/bun-template/",
+  "homepage": "<fill in homepage>",
   "author": {
-    "name": "Jack Le Hamster",
+    "name": "Vincent Le Quang",
     "email": "jacklehamster@gmail.com"
   },
   "license": "MIT",
