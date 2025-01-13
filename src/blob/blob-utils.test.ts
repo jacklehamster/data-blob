@@ -1,5 +1,5 @@
-import { expect, it, describe } from 'bun:test';
-import { extractPayload } from './blob-utils';
+import { expect, it, describe, jest, beforeEach, afterEach } from 'bun:test';
+import { extractBlobUrlsFromPayload, extractPayload, includeBlobsInPayload } from './blob-utils';
 import { PayloadType } from './payload-enum';
 
 describe('extractPayload', () => {
@@ -80,4 +80,90 @@ it('handles multiple Blob payloads', async () => {
   const extractedBlob2 = result[1] as Blob;
   const extractedContent2 = new Uint8Array(await extractedBlob2.arrayBuffer());
   expect(extractedContent2).toEqual(blobContent2);
+});
+
+describe('includeBlobsInPayload', () => {
+  const createObjectURL = global.URL.createObjectURL;
+  beforeEach(() => {
+    global.URL.createObjectURL = jest.fn(() => 'blob:http://example.com/12345678-1234-1234-1234-123456789012');
+  });
+
+  afterEach(() => {
+    global.URL.createObjectURL = createObjectURL;
+  });
+
+  it('replaces blob URLs with object URLs', () => {
+    const blobs = [new Blob([new Uint8Array([1, 2, 3, 4, 5])])];
+    const payload = "{blob:0}";
+
+    const result = includeBlobsInPayload(payload, blobs);
+
+    expect(result.startsWith("blob:")).toBe(true);
+  });
+
+  it('handles nested blob URLs', () => {
+    const blobs = [new Blob([new Uint8Array([1, 2, 3, 4, 5])])];
+    const payload = { nested: "{blob:0}" };
+
+    const result = includeBlobsInPayload(payload, blobs);
+
+    expect(result.nested.startsWith("blob:")).toBe(true);
+  });
+
+  it('handles arrays with blob URLs', () => {
+    const blobs = [new Blob([new Uint8Array([1, 2, 3, 4, 5])])];
+    const payload = ["{blob:0}"];
+
+    const result = includeBlobsInPayload(payload, blobs);
+
+    expect(result[0].startsWith("blob:")).toBe(true);
+  });
+});
+
+describe('extractBlobUrlsFromPayload', () => {
+  const fetch = global.fetch;
+  beforeEach(() => {
+    global.fetch = jest.fn((url) => {
+      if (url.startsWith('blob:')) {
+        return Promise.resolve({
+          blob: () => Promise.resolve(new Blob(['{"key":"value"}'], { type: 'application/json' })),
+        });
+      }
+      return Promise.reject(new Error('Unknown URL'));
+    }) as any;
+  })
+
+  afterEach(() => {
+    global.fetch = fetch;
+  });
+
+  it('replaces blob URLs with placeholders', async () => {
+    const blobs: Blob[] = [];
+    const payload = "blob:http://example.com/12345";
+
+    const result = await extractBlobUrlsFromPayload(payload, blobs);
+
+    expect(result).toBe("{blob:0}");
+    expect(blobs.length).toBe(1);
+  });
+
+  it('handles nested blob URLs', async () => {
+    const blobs: Blob[] = [];
+    const payload = { nested: "blob:http://example.com/12345" };
+
+    const result = await extractBlobUrlsFromPayload(payload, blobs);
+
+    expect(result.nested).toBe("{blob:0}");
+    expect(blobs.length).toBe(1);
+  });
+
+  it('handles arrays with blob URLs', async () => {
+    const blobs: Blob[] = [];
+    const payload = ["blob:http://example.com/12345"];
+
+    const result = await extractBlobUrlsFromPayload(payload, blobs);
+
+    expect(result[0]).toBe("{blob:0}");
+    expect(blobs.length).toBe(1);
+  });
 });
