@@ -6,7 +6,7 @@ describe('BlobBuilder', () => {
   it('should add JSON payload correctly', async () => {
     const builder = new BlobBuilder();
     const payload = { key: 'value' };
-    builder.addPayload(payload);
+    builder.payload(payload);
 
     const expectedType = new Uint8Array([PayloadType.JSON]).buffer;
     const json = JSON.stringify(payload);
@@ -22,7 +22,7 @@ describe('BlobBuilder', () => {
   it('should build a Blob with the correct data', async () => {
     const builder = new BlobBuilder();
     const payload = { key: 'value' };
-    builder.addPayload(payload);
+    builder.payload(payload);
     const blob = builder.build();
 
     const expectedType = new Uint8Array([PayloadType.JSON]).buffer;
@@ -52,7 +52,7 @@ it('should add Blob payload correctly', async () => {
   const builder = new BlobBuilder();
   const blobContent = new Uint8Array([1, 2, 3, 4, 5]);
   const blob = new Blob([blobContent]);
-  builder.addBlob(blob);
+  builder.blob(blob);
 
   const expectedType = new Uint8Array([PayloadType.BLOB]).buffer;
   const expectedSize = new Uint32Array([blob.size]).buffer;
@@ -66,7 +66,7 @@ it('should build a Blob with the correct Blob data', async () => {
   const builder = new BlobBuilder();
   const blobContent = new Uint8Array([1, 2, 3, 4, 5]);
   const blob = new Blob([blobContent]);
-  builder.addBlob(blob);
+  builder.blob(blob);
   const builtBlob = builder.build();
 
   const expectedType = new Uint8Array([PayloadType.BLOB]).buffer;
