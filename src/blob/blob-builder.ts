@@ -8,6 +8,14 @@ export class BlobBuilder {
   readonly data: Array<ArrayBuffer | Blob> = [];
   readonly encoder = new TextEncoder();
 
+  static payload(payload: any) {
+    return new BlobBuilder().payload(payload);
+  }
+
+  static blob(blob: Blob) {
+    return new BlobBuilder().blob(blob);
+  }
+
   payload(payload: any) {
     const type = new Uint8Array([PayloadType.JSON]);
     this.data.push(type.buffer);
