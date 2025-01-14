@@ -1,5 +1,5 @@
 import { expect, it, describe, jest, beforeEach, afterEach } from 'bun:test';
-import { extractBlobUrlsFromPayload, extractPayload, includeBlobsInPayload } from './blob-utils';
+import { extractBlobsFromPayload, extractPayload, includeBlobsInPayload } from './blob-utils';
 import { PayloadType } from './payload-enum';
 
 describe('extractPayload', () => {
@@ -110,7 +110,7 @@ describe('extractBlobUrlsFromPayload', () => {
     const blobs: Record<string, Blob> = {};
     const payload = "blob:http://example.com/12345";
 
-    const result = await extractBlobUrlsFromPayload(payload, blobs, () => "uid");
+    const result = await extractBlobsFromPayload(payload, blobs, () => "uid");
 
     expect(result).toBe("{blob:uid}");
   });
@@ -119,7 +119,7 @@ describe('extractBlobUrlsFromPayload', () => {
     const blobs: Record<string, Blob> = {};
     const payload = { nested: "blob:http://example.com/12345" };
 
-    const result = await extractBlobUrlsFromPayload(payload, blobs, () => "uid");
+    const result = await extractBlobsFromPayload(payload, blobs, () => "uid");
 
     expect(result.nested).toBe("{blob:uid}");
   });
@@ -128,7 +128,7 @@ describe('extractBlobUrlsFromPayload', () => {
     const blobs: Record<string, Blob> = {};
     const payload = ["blob:http://example.com/12345"];
 
-    const result = await extractBlobUrlsFromPayload(payload, blobs, () => "uid");
+    const result = await extractBlobsFromPayload(payload, blobs, () => "uid");
 
     expect(result[0]).toBe("{blob:uid}");
   });
