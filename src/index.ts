@@ -1,2 +1,2 @@
-export { BlobBuilder } from './blob/blob-builder';
-export { extractPayload } from './blob/blob-utils';
+export * from './blob/blob-builder';
+export * from './blob/blob-utils';
