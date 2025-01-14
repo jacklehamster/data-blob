@@ -63,7 +63,7 @@ describe('includeBlobsInPayload', () => {
 
   it('replaces blob URLs with object URLs', () => {
     const blobs = { uid: new Blob([new Uint8Array([1, 2, 3, 4, 5])]) };
-    const payload = "{blob:uid}";
+    const payload = "{blobUrl:uid}";
 
     const result = includeBlobsInPayload(payload, blobs);
 
@@ -72,7 +72,7 @@ describe('includeBlobsInPayload', () => {
 
   it('handles nested blob URLs', () => {
     const blobs = { uid: new Blob([new Uint8Array([1, 2, 3, 4, 5])]) };
-    const payload = { nested: "{blob:uid}" };
+    const payload = { nested: "{blobUrl:uid}" };
 
     const result = includeBlobsInPayload(payload, blobs);
 
@@ -81,7 +81,7 @@ describe('includeBlobsInPayload', () => {
 
   it('handles arrays with blob URLs', () => {
     const blobs = { uid: new Blob([new Uint8Array([1, 2, 3, 4, 5])]) };
-    const payload = ["{blob:uid}"];
+    const payload = ["{blobUrl:uid}"];
 
     const result = includeBlobsInPayload(payload, blobs);
 
@@ -112,7 +112,7 @@ describe('extractBlobUrlsFromPayload', () => {
 
     const result = await extractBlobsFromPayload(payload, blobs, () => "uid");
 
-    expect(result).toBe("{blob:uid}");
+    expect(result).toBe("{blobUrl:uid}");
   });
 
   it('handles nested blob URLs', async () => {
@@ -121,7 +121,7 @@ describe('extractBlobUrlsFromPayload', () => {
 
     const result = await extractBlobsFromPayload(payload, blobs, () => "uid");
 
-    expect(result.nested).toBe("{blob:uid}");
+    expect(result.nested).toBe("{blobUrl:uid}");
   });
 
   it('handles arrays with blob URLs', async () => {
@@ -130,6 +130,6 @@ describe('extractBlobUrlsFromPayload', () => {
 
     const result = await extractBlobsFromPayload(payload, blobs, () => "uid");
 
-    expect(result[0]).toBe("{blob:uid}");
+    expect(result[0]).toBe("{blobUrl:uid}");
   });
 });
