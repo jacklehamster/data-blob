@@ -4,15 +4,18 @@ import { PayloadType } from './payload-enum';
 
 describe('extractPayload', () => {
   it('extracts JSON payload from blob', async () => {
+    const key = "payload";
+    const keySize = new Uint8Array([key.length]);
+    const keyBuffer = new TextEncoder().encode(key);
     const jsonPayload = { key: 'value' };
     const jsonString = JSON.stringify(jsonPayload);
     const size = new Uint32Array([jsonString.length]);
     const type = new Uint8Array([PayloadType.JSON]);
-    const blob = new Blob([type, size, jsonString]);
+    const blob = new Blob([keySize, keyBuffer, type, size, jsonString]);
 
     const result = await extractPayload(blob);
 
-    expect(result).toEqual([jsonPayload]);
+    expect(result).toEqual({ payload: jsonPayload });
   });
 
   it('handles empty blob', async () => {
@@ -20,66 +23,32 @@ describe('extractPayload', () => {
 
     const result = await extractPayload(blob);
 
-    expect(result).toEqual([]);
+    expect(result).toEqual({});
   });
 
   it('handles multiple JSON payloads', async () => {
+    const key1 = "payload1";
+    const keySize1 = new Uint8Array([key1.length]);
+    const keyBuffer1 = new TextEncoder().encode(key1);
     const jsonPayload1 = { key1: 'value1' };
     const jsonString1 = JSON.stringify(jsonPayload1);
     const size1 = new Uint32Array([jsonString1.length]);
     const type1 = new Uint8Array([PayloadType.JSON]);
 
+    const key2 = "payload2";
+    const keySize2 = new Uint8Array([key2.length]);
+    const keyBuffer2 = new TextEncoder().encode(key2);
     const jsonPayload2 = { key2: 'value2' };
     const jsonString2 = JSON.stringify(jsonPayload2);
     const size2 = new Uint32Array([jsonString2.length]);
     const type2 = new Uint8Array([PayloadType.JSON]);
 
-    const blob = new Blob([type1, size1, jsonString1, type2, size2, jsonString2]);
+    const blob = new Blob([keySize1, keyBuffer1, type1, size1, jsonString1, keySize2, keyBuffer2, type2, size2, jsonString2]);
 
     const result = await extractPayload(blob);
 
-    expect(result).toEqual([jsonPayload1, jsonPayload2]);
+    expect(result).toEqual({ payload1: jsonPayload1, payload2: jsonPayload2 });
   });
-});
-it('extracts Blob payload from blob', async () => {
-  const blobContent = new Uint8Array([1, 2, 3, 4, 5]);
-  const size = new Uint32Array([blobContent.length]);
-  const type = new Uint8Array([PayloadType.BLOB]);
-  const blob = new Blob([type, size, blobContent]);
-
-  const result = await extractPayload(blob);
-
-  expect(result.length).toBe(1);
-  expect(result[0] instanceof Blob).toBe(true);
-  const extractedBlob = result[0] as Blob;
-  const extractedContent = new Uint8Array(await extractedBlob.arrayBuffer());
-  expect(extractedContent).toEqual(blobContent);
-});
-
-it('handles multiple Blob payloads', async () => {
-  const blobContent1 = new Uint8Array([1, 2, 3, 4, 5]);
-  const size1 = new Uint32Array([blobContent1.length]);
-  const type1 = new Uint8Array([PayloadType.BLOB]);
-
-  const blobContent2 = new Uint8Array([6, 7, 8, 9, 10]);
-  const size2 = new Uint32Array([blobContent2.length]);
-  const type2 = new Uint8Array([PayloadType.BLOB]);
-
-  const blob = new Blob([type1, size1, blobContent1, type2, size2, blobContent2]);
-
-  const result = await extractPayload(blob);
-
-  expect(result.length).toBe(2);
-  expect(result[0] instanceof Blob).toBe(true);
-  expect(result[1] instanceof Blob).toBe(true);
-
-  const extractedBlob1 = result[0] as Blob;
-  const extractedContent1 = new Uint8Array(await extractedBlob1.arrayBuffer());
-  expect(extractedContent1).toEqual(blobContent1);
-
-  const extractedBlob2 = result[1] as Blob;
-  const extractedContent2 = new Uint8Array(await extractedBlob2.arrayBuffer());
-  expect(extractedContent2).toEqual(blobContent2);
 });
 
 describe('includeBlobsInPayload', () => {

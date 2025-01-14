@@ -6,28 +6,37 @@ import { PayloadType } from "./payload-enum";
 
 export class BlobBuilder {
   readonly data: Array<ArrayBuffer | Blob> = [];
-  readonly encoder = new TextEncoder();
+  readonly #encoder = new TextEncoder();
 
-  static payload(payload: any) {
-    return new BlobBuilder().payload(payload);
+  static payload(key: string, payload: any) {
+    return new BlobBuilder().payload(key, payload);
   }
 
-  static blob(blob: Blob) {
-    return new BlobBuilder().blob(blob);
+  static blob(key: string, blob: Blob) {
+    return new BlobBuilder().blob(key, blob);
   }
 
-  payload(payload: any) {
+  #saveKey(key: string) {
+    const buffer = this.#encoder.encode(key);
+    const size = new Uint8Array([buffer.byteLength]);
+    this.data.push(size.buffer);
+    this.data.push(buffer.buffer as ArrayBuffer);
+  }
+
+  payload(key: string, payload: any) {
+    this.#saveKey(key);
     const type = new Uint8Array([PayloadType.JSON]);
     this.data.push(type.buffer);
     const json = JSON.stringify(payload);
-    const buffer = this.encoder.encode(json);
+    const buffer = this.#encoder.encode(json);
     const size = new Uint32Array([buffer.byteLength]);
     this.data.push(size.buffer);
     this.data.push(buffer.buffer as ArrayBuffer);
     return this;
   }
 
-  blob(blob: Blob) {
+  blob(key: string, blob: Blob) {
+    this.#saveKey(key);
     const type = new Uint8Array([PayloadType.BLOB]);
     this.data.push(type.buffer);
     const size = new Uint32Array([blob.size]);
