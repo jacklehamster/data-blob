@@ -1,5 +1,4 @@
 import { PayloadType } from "./payload-enum";
-import crypto from "crypto";
 
 
 export async function extractPayload(blob: Blob): Promise<Record<string, any>> {
@@ -41,7 +40,7 @@ export async function extractPayload(blob: Blob): Promise<Record<string, any>> {
 export async function extractBlobUrlsFromPayload(
   payload: any,
   blobs: Record<string, Blob>,
-  generateUid: () => string = () => crypto.randomBytes(16).toString("hex")
+  generateUid: () => string = () => globalThis.crypto.randomUUID()
 ): Promise<any> {
   if (typeof payload === "string" && payload.startsWith("blob:")) {
     const blob = await fetch(payload).then(response => response.blob());
