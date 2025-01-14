@@ -37,25 +37,23 @@ export async function extractPayload(blob: Blob): Promise<Record<string, any>> {
 }
 
 //  Browser code
-export async function extractBlobUrlsFromPayload(
+export async function extractBlobsFromPayload(
   payload: any,
   blobs: Record<string, Blob>,
   generateUid: () => string = () => globalThis.crypto.randomUUID()
 ): Promise<any> {
-  if (typeof payload === "string" && payload.startsWith("blob:")) {
-    const blob = await fetch(payload).then(response => response.blob());
-    URL.revokeObjectURL(payload);
+  if (typeof payload === "object" && payload instanceof Blob) {
     const uid = generateUid();
-    blobs[uid] = blob;
+    blobs[uid] = payload;
     return `{blob:${uid}}`;
   }
   if (Array.isArray(payload)) {
     await Promise.all(payload.map(async (value, index) => {
-      payload[index] = await extractBlobUrlsFromPayload(value, blobs, generateUid);
+      payload[index] = await extractBlobsFromPayload(value, blobs, generateUid);
     }));
   } else if (typeof payload === "object" && payload) {
     await Promise.all(Object.entries(payload).map(async ([key, value]) => {
-      payload[key] = await extractBlobUrlsFromPayload(value, blobs, generateUid);
+      payload[key] = await extractBlobsFromPayload(value, blobs, generateUid);
     }));
   }
   return payload;
@@ -65,7 +63,7 @@ export async function extractBlobUrlsFromPayload(
 export function includeBlobsInPayload(payload: any, blobs: Record<string, Blob>): any {
   if (typeof payload === "string" && payload.startsWith("{blob:")) {
     const uid = payload.substring(6, payload.length - 1);
-    return URL.createObjectURL(blobs[uid]);
+    return blobs[uid];
   }
   if (Array.isArray(payload)) {
     payload.forEach((value, index) => {
