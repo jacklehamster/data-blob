@@ -45,14 +45,14 @@ export async function extractBlobsFromPayload(
   if (typeof payload === "string" && payload.startsWith("blob:")) {
     const blob = await fetch(payload).then(response => response.blob());
     URL.revokeObjectURL(payload);
-    const uid = generateUid();
+    const uid = `{blobUrl:${generateUid()}}`;
     blobs[uid] = blob;
-    return `{blobUrl:${uid}}`;
+    return uid;
   }
   if (typeof payload === "object" && payload instanceof Blob) {
-    const uid = generateUid();
+    const uid = `blob:${generateUid()}`;
     blobs[uid] = payload;
-    return `{blob:${uid}}`;
+    return uid;
   }
   if (Array.isArray(payload)) {
     await Promise.all(payload.map(async (value, index) => {
@@ -69,12 +69,10 @@ export async function extractBlobsFromPayload(
 //  Browser code
 export function includeBlobsInPayload(payload: any, blobs: Record<string, Blob>): any {
   if (typeof payload === "string" && payload.startsWith("{blobUrl:")) {
-    const uid = payload.substring(9, payload.length - 1);
-    return URL.createObjectURL(blobs[uid]);
+    return URL.createObjectURL(blobs[payload]);
   }
   if (typeof payload === "string" && payload.startsWith("{blob:")) {
-    const uid = payload.substring(6, payload.length - 1);
-    return blobs[uid];
+    return blobs[payload];
   }
   if (Array.isArray(payload)) {
     payload.forEach((value, index) => {
