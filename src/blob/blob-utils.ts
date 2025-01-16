@@ -50,7 +50,7 @@ export async function extractBlobsFromPayload(
     return uid;
   }
   if (typeof payload === "object" && payload instanceof Blob) {
-    const uid = `blob:${generateUid()}`;
+    const uid = `{blob:${generateUid()}}`;
     blobs[uid] = payload;
     return uid;
   }
