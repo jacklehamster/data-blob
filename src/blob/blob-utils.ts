@@ -1,37 +1,62 @@
 import { PayloadType } from "./payload-enum";
 
+const DECODER = new TextDecoder();
+
+function extractShortStringFromArrayBuffer(arrayBuffer: ArrayBuffer, offset: number): [string, number] {
+  const [keySize, keySizeOffset] = extractByteFromArrayBuffer(arrayBuffer, offset);
+  const key = DECODER.decode(new Uint8Array(arrayBuffer, keySizeOffset, keySize));
+  return [key, keySizeOffset + keySize];
+}
+
+function extractLongStringFromArrayBuffer(arrayBuffer: ArrayBuffer, offset: number): [string, number] {
+  const [strSize, strSizeOffset] = extractLongFromArrayBuffer(arrayBuffer, offset);
+  const str = DECODER.decode(new Uint8Array(arrayBuffer, strSizeOffset, strSize));
+  return [str, strSizeOffset + strSize];
+}
+
+function extractBlobFromArrayBuffer(arrayBuffer: ArrayBuffer, offset: number): [Blob, number] {
+  const [blobSize, blobSizeOffset] = extractLongFromArrayBuffer(arrayBuffer, offset);
+  const blob = new Blob([new Uint8Array(arrayBuffer, blobSizeOffset, blobSize)], { type: "application/octet-stream" });
+  return [blob, blobSizeOffset + blobSize];
+}
+
+function extractLongFromArrayBuffer(arrayBuffer: ArrayBuffer, offset: number): [number, number] {
+  const uint32Array = new Uint32Array(arrayBuffer.slice(offset, offset + Uint32Array.BYTES_PER_ELEMENT), 0, 1);
+  return [uint32Array[0], offset + Uint32Array.BYTES_PER_ELEMENT];
+}
+
+function extractByteFromArrayBuffer(arrayBuffer: ArrayBuffer, offset: number): [number, number] {
+  const uint8Array = new Uint8Array(arrayBuffer, offset, 1);
+  return [uint8Array[0], offset + Uint8Array.BYTES_PER_ELEMENT];
+}
 
 export async function extractPayload(blob: Blob): Promise<Record<string, any>> {
-  const decoder = new TextDecoder();
   const payload: Record<string, any> = {};
   let offset = 0;
   let arrayBuffer;
   while (offset < blob.size) {
     arrayBuffer = arrayBuffer ?? await blob.arrayBuffer();
-    const keySize = new Uint8Array(arrayBuffer, offset, 1);
-    offset += Uint8Array.BYTES_PER_ELEMENT;
-    const key = decoder.decode(new Uint8Array(arrayBuffer, offset, keySize[0]));
-    offset += keySize[0];
+    const [key, keyOffset] = extractShortStringFromArrayBuffer(arrayBuffer, offset);
+    offset = keyOffset;
+    const [type, typeOffset] = extractByteFromArrayBuffer(arrayBuffer, offset);
+    offset = typeOffset;
 
-    const type = new Uint8Array(arrayBuffer, offset, 1);
-    offset += Uint8Array.BYTES_PER_ELEMENT;
-    const size = new Uint32Array(arrayBuffer.slice(offset, offset + Uint32Array.BYTES_PER_ELEMENT), 0, 1);
-    offset += Uint32Array.BYTES_PER_ELEMENT;
-
-    switch (type[0]) {
+    switch (type) {
       case PayloadType.JSON:
         try {
-          const str = decoder.decode(new Uint8Array(arrayBuffer, offset, size[0]));
+          const [str, strOffset] = extractLongStringFromArrayBuffer(arrayBuffer, offset);
+          offset = strOffset;
           payload[key] = JSON.parse(str);
         } catch (error) {
           console.warn("Failed to parse JSON payload", error);
         }
         break;
       case PayloadType.BLOB:
-        payload[key] = new Blob([arrayBuffer.slice(offset, offset + size[0])]);
+        const [blob, blobOffset] = extractBlobFromArrayBuffer(arrayBuffer, offset);
+        offset = blobOffset;
+        payload[key] = blob;
         break;
     }
-    offset += size[0];
   }
   return payload;
 }
