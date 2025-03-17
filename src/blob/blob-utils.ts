@@ -30,7 +30,7 @@ function extractByteFromArrayBuffer(arrayBuffer: ArrayBuffer, offset: number): [
   return [uint8Array[0], offset + Uint8Array.BYTES_PER_ELEMENT];
 }
 
-export async function extractPayload(blob: Blob): Promise<Record<string, any>> {
+export async function extractPayload<T extends Record<string, any>>(blob: Blob): Promise<T> {
   const payload: Record<string, any> = {};
   let offset = 0;
   let arrayBuffer;
@@ -58,34 +58,53 @@ export async function extractPayload(blob: Blob): Promise<Record<string, any>> {
         break;
     }
   }
-  return payload;
+  return payload as T;
+}
+
+async function generateBlobHash(blob: Blob): Promise<string> {
+  const chunkSize = 64 * 1024; // 64KB chunks
+  const chunks = Math.ceil(blob.size / chunkSize);
+  let hashBuffer = await crypto.subtle.digest('SHA-256', new Uint8Array(0)); // Initialize with empty buffer
+
+  for (let i = 0; i < chunks; i++) {
+    const chunk = blob.slice(i * chunkSize, (i + 1) * chunkSize);
+    const arrayBuffer = await chunk.arrayBuffer();
+    const chunkHashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+    const combinedBuffer = new Uint8Array(hashBuffer.byteLength + chunkHashBuffer.byteLength);
+    combinedBuffer.set(new Uint8Array(hashBuffer), 0);
+    combinedBuffer.set(new Uint8Array(chunkHashBuffer), hashBuffer.byteLength);
+    hashBuffer = await crypto.subtle.digest('SHA-256', combinedBuffer.buffer);
+  }
+
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex;
 }
 
 //  Browser code
 export async function extractBlobsFromPayload(
   payload: any,
   blobs: Record<string, Blob>,
-  generateUid: () => string = () => globalThis.crypto.randomUUID()
 ): Promise<any> {
   if (typeof payload === "string" && payload.startsWith("blob:")) {
     const blob = await fetch(payload).then(response => response.blob());
     URL.revokeObjectURL(payload);
-    const uid = `{blobUrl:${generateUid()}}`;
+    const uid = `{blobUrl:${await generateBlobHash(blob)}}`;
     blobs[uid] = blob;
     return uid;
   }
   if (typeof payload === "object" && payload instanceof Blob) {
-    const uid = `{blob:${generateUid()}}`;
+    const uid = `{blob:${await generateBlobHash(payload)}}`;
     blobs[uid] = payload;
     return uid;
   }
   if (Array.isArray(payload)) {
     await Promise.all(payload.map(async (value, index) => {
-      payload[index] = await extractBlobsFromPayload(value, blobs, generateUid);
+      payload[index] = await extractBlobsFromPayload(value, blobs);
     }));
   } else if (typeof payload === "object" && payload) {
     await Promise.all(Object.entries(payload).map(async ([key, value]) => {
-      payload[key] = await extractBlobsFromPayload(value, blobs, generateUid);
+      payload[key] = await extractBlobsFromPayload(value, blobs);
     }));
   }
   return payload;

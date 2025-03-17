@@ -205,8 +205,7 @@ var require_react_development = __commonJS((exports, module) => {
           }
         }
       }
-      function ComponentDummy() {
-      }
+      function ComponentDummy() {}
       ComponentDummy.prototype = Component.prototype;
       function PureComponent(props, context, updater) {
         this.props = props;
@@ -1067,8 +1066,7 @@ Your code should look like:
       var prevGroup;
       var prevGroupCollapsed;
       var prevGroupEnd;
-      function disabledLog() {
-      }
+      function disabledLog() {}
       disabledLog.__reactDisabledLog = true;
       function disableLogs() {
         {
@@ -1304,8 +1302,7 @@ Your code should look like:
               var init = lazyComponent._init;
               try {
                 return describeUnknownElementTypeFrameInDEV(init(payload), source, ownerFn);
-              } catch (x) {
-              }
+              } catch (x) {}
             }
           }
         }
@@ -1676,8 +1673,7 @@ Check the top-level render call using <` + parentName + ">.";
             };
             {
               if (!didWarnNoAwaitAct && typeof Promise !== "undefined") {
-                Promise.resolve().then(function() {
-                }).then(function() {
+                Promise.resolve().then(function() {}).then(function() {
                   if (!wasAwaited) {
                     didWarnNoAwaitAct = true;
                     error("You called act(async () => ...) without await. " + "This could lead to unexpected testing behaviour, " + "interleaving multiple act calls and mixing their " + "scopes. " + "You should - await act(async () => ...);");
@@ -1826,8 +1822,7 @@ Check the top-level render call using <` + parentName + ">.";
 // ../node_modules/react/index.js
 var require_react = __commonJS((exports, module) => {
   var react_development = __toESM(require_react_development(), 1);
-  if (false) {
-  } else {
+  if (false) {} else {
     module.exports = react_development;
   }
 });
@@ -1913,8 +1908,7 @@ var require_scheduler_development = __commonJS((exports) => {
       var NormalPriority = 3;
       var LowPriority = 4;
       var IdlePriority = 5;
-      function markTaskErrored(task, ms) {
-      }
+      function markTaskErrored(task, ms) {}
       var hasPerformanceNow = typeof performance === "object" && typeof performance.now === "function";
       if (hasPerformanceNow) {
         var localPerformance = performance;
@@ -2156,8 +2150,7 @@ var require_scheduler_development = __commonJS((exports) => {
         }
         return newTask;
       }
-      function unstable_pauseExecution() {
-      }
+      function unstable_pauseExecution() {}
       function unstable_continueExecution() {
         if (!isHostCallbackScheduled && !isPerformingWork) {
           isHostCallbackScheduled = true;
@@ -2185,8 +2178,7 @@ var require_scheduler_development = __commonJS((exports) => {
         }
         return true;
       }
-      function requestPaint() {
-      }
+      function requestPaint() {}
       function forceFrameRate(fps) {
         if (fps < 0 || fps > 125) {
           console["error"]("forceFrameRate takes a positive int between 0 and 125, " + "forcing frame rates higher than 125 fps is not supported");
@@ -2281,8 +2273,7 @@ var require_scheduler_development = __commonJS((exports) => {
 // ../node_modules/scheduler/index.js
 var require_scheduler = __commonJS((exports, module) => {
   var scheduler_development = __toESM(require_scheduler_development(), 1);
-  if (false) {
-  } else {
+  if (false) {} else {
     module.exports = scheduler_development;
   }
 });
@@ -2928,8 +2919,7 @@ var require_react_dom_development = __commonJS((exports) => {
       var prevGroup;
       var prevGroupCollapsed;
       var prevGroupEnd;
-      function disabledLog() {
-      }
+      function disabledLog() {}
       disabledLog.__reactDisabledLog = true;
       function disableLogs() {
         {
@@ -3170,8 +3160,7 @@ var require_react_dom_development = __commonJS((exports) => {
               var init = lazyComponent._init;
               try {
                 return describeUnknownElementTypeFrameInDEV(init(payload), source, ownerFn);
-              } catch (x) {
-              }
+              } catch (x) {}
             }
           }
         }
@@ -4124,8 +4113,7 @@ Check the render method of \`` + ownerName + "`.";
       function hyphenateStyleName(name) {
         return name.replace(uppercasePattern, "-$1").toLowerCase().replace(msPattern, "-ms-");
       }
-      var warnValidStyle = function() {
-      };
+      var warnValidStyle = function() {};
       {
         var badVendoredStyleNamePattern = /^(?:webkit|moz|o)[A-Z]/;
         var msPattern$1 = /^-ms-/;
@@ -4952,8 +4940,7 @@ Check the render method of \`` + ownerName + "`.";
           }
         }
       }
-      var validateProperty$1 = function() {
-      };
+      var validateProperty$1 = function() {};
       {
         var warnedProperties$1 = {};
         var EVENT_NAME_REGEX = /^on./;
@@ -5164,8 +5151,7 @@ Check the render method of \`` + ownerName + "`.";
       var batchedUpdatesImpl = function(fn, bookkeeping) {
         return fn(bookkeeping);
       };
-      var flushSyncImpl = function() {
-      };
+      var flushSyncImpl = function() {};
       var isInsideEventHandler = false;
       function finishEventHandler() {
         var controlledComponentsHavePendingUpdates = needsStateRestore();
@@ -5291,8 +5277,7 @@ Check the render method of \`` + ownerName + "`.";
                 if (error2 != null && typeof error2 === "object") {
                   try {
                     error2._suppressLogging = true;
-                  } catch (inner) {
-                  }
+                  } catch (inner) {}
                 }
               }
             }
@@ -7163,8 +7148,7 @@ Check the render method of \`` + ownerName + "`.";
             }
             this.isPropagationStopped = functionThatReturnsTrue;
           },
-          persist: function() {
-          },
+          persist: function() {},
           isPersistent: functionThatReturnsTrue
         });
         return SyntheticBaseEvent;
@@ -8772,8 +8756,7 @@ Check the render method of \`` + ownerName + "`.";
       function getOwnerDocumentFromRootContainer(rootContainerElement) {
         return rootContainerElement.nodeType === DOCUMENT_NODE ? rootContainerElement : rootContainerElement.ownerDocument;
       }
-      function noop() {
-      }
+      function noop() {}
       function trapClickOnNonInteractiveElement(node) {
         node.onclick = noop;
       }
@@ -9384,10 +9367,8 @@ Check the render method of \`` + ownerName + "`.";
             return;
         }
       }
-      var validateDOMNesting = function() {
-      };
-      var updatedAncestorInfo = function() {
-      };
+      var validateDOMNesting = function() {};
+      var updatedAncestorInfo = function() {};
       {
         var specialTags = ["address", "applet", "area", "article", "aside", "base", "basefont", "bgsound", "blockquote", "body", "br", "button", "caption", "center", "col", "colgroup", "dd", "details", "dir", "div", "dl", "dt", "embed", "fieldset", "figcaption", "figure", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "iframe", "img", "input", "isindex", "li", "link", "listing", "main", "marquee", "menu", "menuitem", "meta", "nav", "noembed", "noframes", "noscript", "object", "ol", "p", "param", "plaintext", "pre", "script", "section", "select", "source", "style", "summary", "table", "tbody", "td", "template", "textarea", "tfoot", "th", "thead", "title", "tr", "track", "ul", "wbr", "xmp"];
         var inScopeTags = [
@@ -10974,16 +10955,11 @@ Check the render method of \`` + ownerName + "`.";
         return ReactCurrentBatchConfig$1.transition;
       }
       var ReactStrictModeWarnings = {
-        recordUnsafeLifecycleWarnings: function(fiber, instance) {
-        },
-        flushPendingUnsafeLifecycleWarnings: function() {
-        },
-        recordLegacyContextWarning: function(fiber, instance) {
-        },
-        flushLegacyContextWarning: function() {
-        },
-        discardPendingWarnings: function() {
-        }
+        recordUnsafeLifecycleWarnings: function(fiber, instance) {},
+        flushPendingUnsafeLifecycleWarnings: function() {},
+        recordLegacyContextWarning: function(fiber, instance) {},
+        flushLegacyContextWarning: function() {},
+        discardPendingWarnings: function() {}
       };
       {
         var findStrictRoot = function(fiber) {
@@ -11195,8 +11171,7 @@ Learn more about this warning here: https://reactjs.org/link/legacy-context`, so
       var didWarnAboutStringRefs;
       var ownerHasKeyUseWarning;
       var ownerHasFunctionTypeWarning;
-      var warnForMissingKey = function(child, returnFiber) {
-      };
+      var warnForMissingKey = function(child, returnFiber) {};
       {
         didWarnAboutMaps = false;
         didWarnAboutGenerators = false;
@@ -13491,8 +13466,7 @@ Learn more about this warning here: https://reactjs.org/link/legacy-context`, so
         var effectDeps = deps !== null && deps !== undefined ? deps.concat([ref]) : null;
         return updateEffectImpl(Update, Layout, imperativeHandleEffect.bind(null, create, ref), effectDeps);
       }
-      function mountDebugValue(value, formatterFn) {
-      }
+      function mountDebugValue(value, formatterFn) {}
       var updateDebugValue = mountDebugValue;
       function mountCallback(callback, deps) {
         var hook = mountWorkInProgressHook();
@@ -13716,8 +13690,7 @@ Learn more about this warning here: https://reactjs.org/link/legacy-context`, so
                   enqueueConcurrentHookUpdateAndEagerlyBailout(fiber, queue, update, lane);
                   return;
                 }
-              } catch (error2) {
-              } finally {
+              } catch (error2) {} finally {
                 {
                   ReactCurrentDispatcher$1.current = prevDispatcher;
                 }
@@ -15362,8 +15335,7 @@ Learn more about this warning here: https://reactjs.org/link/legacy-context`, so
 
 ` + ("" + errorBoundaryMessage);
             console["error"](combinedMessage);
-          } else {
-          }
+          } else {}
         } catch (e) {
           setTimeout(function() {
             throw e;
@@ -17263,8 +17235,7 @@ Check the render method of \`` + ownerName + "`.";
             node = node.sibling;
           }
         };
-        updateHostContainer = function(current2, workInProgress2) {
-        };
+        updateHostContainer = function(current2, workInProgress2) {};
         updateHostComponent$1 = function(current2, workInProgress2, type, newProps, rootContainerInstance) {
           var oldProps = current2.memoizedProps;
           if (oldProps === newProps) {
@@ -22487,8 +22458,7 @@ Check the render method of \`` + ownerName + "`.";
           return container.firstChild;
         }
       }
-      function noopOnRecoverableError() {
-      }
+      function noopOnRecoverableError() {}
       function legacyCreateRootFromDOMContainer(container, initialChildren, parentComponent, callback, isHydrationContainer) {
         if (isHydrationContainer) {
           if (typeof callback === "function") {
@@ -22758,8 +22728,7 @@ You might need to use a local HTTP server (instead of file://): ` + "https://rea
 // ../node_modules/react-dom/index.js
 var require_react_dom = __commonJS((exports, module) => {
   var react_dom_development = __toESM(require_react_dom_development(), 1);
-  if (false) {
-  } else {
+  if (false) {} else {
     module.exports = react_dom_development;
   }
 });
@@ -22767,8 +22736,7 @@ var require_react_dom = __commonJS((exports, module) => {
 // ../node_modules/react-dom/client.js
 var require_client = __commonJS((exports) => {
   var m = __toESM(require_react_dom(), 1);
-  if (false) {
-  } else {
+  if (false) {} else {
     i = m.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
     exports.createRoot = function(c, o) {
       i.usingClientEntryPoint = true;
@@ -22948,8 +22916,7 @@ var require_react_jsx_dev_runtime_development = __commonJS((exports) => {
       var prevGroup;
       var prevGroupCollapsed;
       var prevGroupEnd;
-      function disabledLog() {
-      }
+      function disabledLog() {}
       disabledLog.__reactDisabledLog = true;
       function disableLogs() {
         {
@@ -23185,8 +23152,7 @@ var require_react_jsx_dev_runtime_development = __commonJS((exports) => {
               var init = lazyComponent._init;
               try {
                 return describeUnknownElementTypeFrameInDEV(init(payload), source, ownerFn);
-              } catch (x) {
-              }
+              } catch (x) {}
             }
           }
         }
@@ -23676,8 +23642,7 @@ Check the top-level render call using <` + parentName + ">.";
 // ../node_modules/react/jsx-dev-runtime.js
 var require_jsx_dev_runtime = __commonJS((exports, module) => {
   var react_jsx_dev_runtime_development = __toESM(require_react_jsx_dev_runtime_development(), 1);
-  if (false) {
-  } else {
+  if (false) {} else {
     module.exports = react_jsx_dev_runtime_development;
   }
 });
