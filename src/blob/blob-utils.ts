@@ -85,26 +85,27 @@ async function generateBlobHash(blob: Blob): Promise<string> {
 export async function extractBlobsFromPayload(
   payload: any,
   blobs: Record<string, Blob>,
+  generateUid: (blob: Blob) => Promise<string> = generateBlobHash,
 ): Promise<any> {
   if (typeof payload === "string" && payload.startsWith("blob:")) {
     const blob = await fetch(payload).then(response => response.blob());
     URL.revokeObjectURL(payload);
-    const uid = `{blobUrl:${await generateBlobHash(blob)}}`;
+    const uid = `{blobUrl:${await generateUid(blob)}}`;
     blobs[uid] = blob;
     return uid;
   }
   if (typeof payload === "object" && payload instanceof Blob) {
-    const uid = `{blob:${await generateBlobHash(payload)}}`;
+    const uid = `{blob:${await generateUid(payload)}}`;
     blobs[uid] = payload;
     return uid;
   }
   if (Array.isArray(payload)) {
     await Promise.all(payload.map(async (value, index) => {
-      payload[index] = await extractBlobsFromPayload(value, blobs);
+      payload[index] = await extractBlobsFromPayload(value, blobs, generateUid);
     }));
   } else if (typeof payload === "object" && payload) {
     await Promise.all(Object.entries(payload).map(async ([key, value]) => {
-      payload[key] = await extractBlobsFromPayload(value, blobs);
+      payload[key] = await extractBlobsFromPayload(value, blobs, generateUid);
     }));
   }
   return payload;

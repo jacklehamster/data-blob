@@ -110,7 +110,7 @@ describe('extractBlobUrlsFromPayload', () => {
     const blobs: Record<string, Blob> = {};
     const payload = "blob:http://example.com/12345";
 
-    const result = await extractBlobsFromPayload(payload, blobs, () => "uid");
+    const result = await extractBlobsFromPayload(payload, blobs, async () => "uid");
 
     expect(result).toBe("{blobUrl:uid}");
   });
@@ -119,7 +119,7 @@ describe('extractBlobUrlsFromPayload', () => {
     const blobs: Record<string, Blob> = {};
     const payload = { nested: "blob:http://example.com/12345" };
 
-    const result = await extractBlobsFromPayload(payload, blobs, () => "uid");
+    const result = await extractBlobsFromPayload(payload, blobs, async () => "uid");
 
     expect(result.nested).toBe("{blobUrl:uid}");
   });
@@ -128,7 +128,7 @@ describe('extractBlobUrlsFromPayload', () => {
     const blobs: Record<string, Blob> = {};
     const payload = ["blob:http://example.com/12345"];
 
-    const result = await extractBlobsFromPayload(payload, blobs, () => "uid");
+    const result = await extractBlobsFromPayload(payload, blobs, async () => "uid");
 
     expect(result[0]).toBe("{blobUrl:uid}");
   });
