@@ -86,6 +86,13 @@ describe('includeBlobsInPayload', () => {
     const result = includeBlobsInPayload(payload, blobs);
 
     expect(result[0].startsWith("blob:")).toBe(true);
+    expect(result).not.toBe(payload);
+  });
+
+  it('retains payload if no blob URLs are found', () => {
+    const payload = { key: 'value' };
+    const result = includeBlobsInPayload(payload, {});
+    expect(result).toBe(payload);
   });
 });
 
@@ -122,6 +129,13 @@ describe('extractBlobUrlsFromPayload', () => {
     const result = await extractBlobsFromPayload(payload, blobs, async () => "uid");
 
     expect(result.nested).toBe("{blobUrl:uid}");
+    expect(result).not.toBe(payload);
+  });
+
+  it('retains payload if no blob URLs are found', async () => {
+    const payload = { key: 'value' };
+    const result = await extractBlobsFromPayload(payload, {});
+    expect(result).toBe(payload);
   });
 
   it('handles arrays with blob URLs', async () => {

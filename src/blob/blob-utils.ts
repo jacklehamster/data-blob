@@ -81,7 +81,6 @@ async function generateBlobHash(blob: Blob): Promise<string> {
   return hashHex;
 }
 
-//  Browser code
 export async function extractBlobsFromPayload(
   payload: any,
   blobs: Record<string, Blob>,
@@ -99,13 +98,26 @@ export async function extractBlobsFromPayload(
     blobs[uid] = payload;
     return uid;
   }
+  const prePayload = payload;
   if (Array.isArray(payload)) {
     await Promise.all(payload.map(async (value, index) => {
-      payload[index] = await extractBlobsFromPayload(value, blobs, generateUid);
+      const newValue = await extractBlobsFromPayload(value, blobs, generateUid);
+      if (newValue !== payload[index]) {
+        if (payload === prePayload) {
+          payload = [...payload];
+        }
+        payload[index] = newValue;
+      }
     }));
   } else if (typeof payload === "object" && payload) {
     await Promise.all(Object.entries(payload).map(async ([key, value]) => {
-      payload[key] = await extractBlobsFromPayload(value, blobs, generateUid);
+      const newValue = await extractBlobsFromPayload(value, blobs, generateUid);
+      if (newValue !== payload[key]) {
+        if (payload === prePayload) {
+          payload = { ...payload };
+        }
+        payload[key] = newValue;
+      }
     }));
   }
   return payload;
@@ -119,13 +131,26 @@ export function includeBlobsInPayload(payload: any, blobs: Record<string, Blob>)
   if (typeof payload === "string" && payload.startsWith("{blob:")) {
     return blobs[payload];
   }
+  const prePayload = payload;
   if (Array.isArray(payload)) {
     payload.forEach((value, index) => {
-      payload[index] = includeBlobsInPayload(value, blobs);
+      const newValue = includeBlobsInPayload(value, blobs);
+      if (newValue !== value) {
+        if (payload === prePayload) {
+          payload = [...payload];
+        }
+        payload[index] = newValue;
+      }
     });
   } else if (typeof payload === "object" && payload) {
     Object.entries(payload).forEach(([key, value]) => {
-      payload[key] = includeBlobsInPayload(value, blobs);
+      const newValue = includeBlobsInPayload(value, blobs);
+      if (newValue !== value) {
+        if (payload === prePayload) {
+          payload = { ...payload };
+        }
+        payload[key] = newValue;
+      }
     });
   }
   return payload;
