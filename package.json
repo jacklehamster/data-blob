@@ -2,7 +2,7 @@
   "name": "@dobuki/data-blob",
   "module": "src/index.ts",
   "description": "Dump all your data, objects, images, sound into a Blob",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "keywords": [
     "bun",
     "bunjs",
