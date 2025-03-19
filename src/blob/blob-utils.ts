@@ -31,7 +31,11 @@ function extractByteFromArrayBuffer(arrayBuffer: ArrayBuffer, offset: number): [
   return [uint8Array[0], offset + Uint8Array.BYTES_PER_ELEMENT];
 }
 
-export async function extractPayload<T extends Record<string, any>>(blob: Blob, secret?: string): Promise<T> {
+export function checkPayload(payload: Record<string, any>, secret: string) {
+  return validatePayload(payload, { secret });
+}
+
+export async function extractPayload<T extends Record<string, any>>(blob: Blob): Promise<T> {
   const payload: Record<string, any> = {};
   const blobs: Record<string, Blob> = {};
   let offset = 0;
@@ -47,7 +51,11 @@ export async function extractPayload<T extends Record<string, any>>(blob: Blob, 
       case PayloadType.JSON:
         const [str, strOffset] = extractLongStringFromArrayBuffer(arrayBuffer, offset);
         offset = strOffset;
-        payload[key] = JSON.parse(str);
+        try {
+          payload[key] = JSON.parse(str);
+        } catch (error) {
+          console.error(`Error parsing JSON for key "${key}":`, error);
+        }
         break;
       case PayloadType.BLOB:
         const [blob, blobOffset] = extractBlobFromArrayBuffer(arrayBuffer, offset);
@@ -55,9 +63,6 @@ export async function extractPayload<T extends Record<string, any>>(blob: Blob, 
         blobs[key] = blob;
         break;
     }
-  }
-  if (secret && !validatePayload(payload, { secret })) {
-    throw new Error("Invalid payload signature");
   }
   return { ...payload, ...blobs } as T;
 }
