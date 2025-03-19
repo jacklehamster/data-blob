@@ -2,14 +2,15 @@
 /// <reference lib="dom" />
 /// <reference lib="dom.iterable" />
 
+import { signedPayload } from "@dobuki/payload-validator";
 import { PayloadType } from "./payload-enum";
 
 export class BlobBuilder {
   readonly data: Array<ArrayBuffer | Blob> = [];
   readonly #encoder = new TextEncoder();
 
-  static payload<T = any>(key: string, payload: T) {
-    return new BlobBuilder().payload<T>(key, payload);
+  static payload<T = any>(key: string, payload: T, secret?: string) {
+    return new BlobBuilder().payload<T>(key, payload, secret);
   }
 
   static blob(key: string, blob: Blob) {
@@ -23,11 +24,11 @@ export class BlobBuilder {
     this.data.push(buffer.buffer as ArrayBuffer);
   }
 
-  payload<T = any>(key: string, payload: T) {
+  payload<T = any>(key: string, payload: T, secret?: string) {
     this.#saveKey(key);
     const type = new Uint8Array([PayloadType.JSON]);
     this.data.push(type.buffer);
-    const json = JSON.stringify(payload);
+    const json = JSON.stringify(secret ? signedPayload(payload, { secret }) : payload);
     const buffer = this.#encoder.encode(json);
     const size = new Uint32Array([buffer.byteLength]);
     this.data.push(size.buffer);

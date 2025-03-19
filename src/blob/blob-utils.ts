@@ -1,3 +1,4 @@
+import { validatePayload } from "@dobuki/payload-validator";
 import { PayloadType } from "./payload-enum";
 
 const DECODER = new TextDecoder();
@@ -30,8 +31,9 @@ function extractByteFromArrayBuffer(arrayBuffer: ArrayBuffer, offset: number): [
   return [uint8Array[0], offset + Uint8Array.BYTES_PER_ELEMENT];
 }
 
-export async function extractPayload<T extends Record<string, any>>(blob: Blob): Promise<T> {
+export async function extractPayload<T extends Record<string, any>>(blob: Blob, secret?: string): Promise<T> {
   const payload: Record<string, any> = {};
+  const blobs: Record<string, Blob> = {};
   let offset = 0;
   let arrayBuffer;
   while (offset < blob.size) {
@@ -43,22 +45,21 @@ export async function extractPayload<T extends Record<string, any>>(blob: Blob):
 
     switch (type) {
       case PayloadType.JSON:
-        try {
-          const [str, strOffset] = extractLongStringFromArrayBuffer(arrayBuffer, offset);
-          offset = strOffset;
-          payload[key] = JSON.parse(str);
-        } catch (error) {
-          console.warn("Failed to parse JSON payload", error);
-        }
+        const [str, strOffset] = extractLongStringFromArrayBuffer(arrayBuffer, offset);
+        offset = strOffset;
+        payload[key] = JSON.parse(str);
         break;
       case PayloadType.BLOB:
         const [blob, blobOffset] = extractBlobFromArrayBuffer(arrayBuffer, offset);
         offset = blobOffset;
-        payload[key] = blob;
+        blobs[key] = blob;
         break;
     }
   }
-  return payload as T;
+  if (secret && !validatePayload(payload, { secret })) {
+    throw new Error("Invalid payload signature");
+  }
+  return { ...payload, ...blobs } as T;
 }
 
 async function generateBlobHash(blob: Blob): Promise<string> {
