@@ -67,64 +67,38 @@ export async function extractPayload<T extends Record<string, any>>(blob: Blob):
   return { ...payload, ...blobs } as T;
 }
 
-async function generateBlobHash(blob: Blob): Promise<string> {
-  const chunkSize = 64 * 1024; // 64KB chunks
-  const chunks = Math.ceil(blob.size / chunkSize);
-  let hashBuffer = await crypto.subtle.digest('SHA-256', new Uint8Array(0)); // Initialize with empty buffer
 
-  for (let i = 0; i < chunks; i++) {
-    const chunk = blob.slice(i * chunkSize, (i + 1) * chunkSize);
-    const arrayBuffer = await chunk.arrayBuffer();
-    const chunkHashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-    const combinedBuffer = new Uint8Array(hashBuffer.byteLength + chunkHashBuffer.byteLength);
-    combinedBuffer.set(new Uint8Array(hashBuffer), 0);
-    combinedBuffer.set(new Uint8Array(chunkHashBuffer), hashBuffer.byteLength);
-    hashBuffer = await crypto.subtle.digest('SHA-256', combinedBuffer.buffer);
-  }
-
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex;
-}
-
-export async function extractBlobsFromPayload(
+export function extractBlobsFromPayload(
   payload: any,
   blobs: Record<string, Blob>,
-  generateUid: (blob: Blob) => Promise<string> = generateBlobHash,
-): Promise<any> {
-  if (typeof payload === "string" && payload.startsWith("blob:")) {
-    const blob = await fetch(payload).then(response => response.blob());
-    URL.revokeObjectURL(payload);
-    const uid = `{blobUrl:${await generateUid(blob)}}`;
-    blobs[uid] = blob;
-    return uid;
-  }
+  generateUid: () => string = crypto.randomUUID,
+): any {
   if (typeof payload === "object" && payload instanceof Blob) {
-    const uid = `{blob:${await generateUid(payload)}}`;
+    const uid = `{blob:${generateUid()}}`;
     blobs[uid] = payload;
     return uid;
   }
   const prePayload = payload;
   if (Array.isArray(payload)) {
-    await Promise.all(payload.map(async (value, index) => {
-      const newValue = await extractBlobsFromPayload(value, blobs, generateUid);
+    payload.forEach((value, index) => {
+      const newValue = extractBlobsFromPayload(value, blobs, generateUid);
       if (newValue !== payload[index]) {
         if (payload === prePayload) {
           payload = [...payload];
         }
         payload[index] = newValue;
       }
-    }));
+    });
   } else if (typeof payload === "object" && payload) {
-    await Promise.all(Object.entries(payload).map(async ([key, value]) => {
-      const newValue = await extractBlobsFromPayload(value, blobs, generateUid);
+    Object.entries(payload).forEach(([key, value]) => {
+      const newValue = extractBlobsFromPayload(value, blobs, generateUid);
       if (newValue !== payload[key]) {
         if (payload === prePayload) {
           payload = { ...payload };
         }
         payload[key] = newValue;
       }
-    }));
+    });
   }
   return payload;
 }
