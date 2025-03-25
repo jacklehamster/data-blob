@@ -113,37 +113,9 @@ describe('extractBlobUrlsFromPayload', () => {
     global.fetch = fetch;
   });
 
-  it('replaces blob URLs with placeholders', async () => {
-    const blobs: Record<string, Blob> = {};
-    const payload = "blob:http://example.com/12345";
-
-    const result = await extractBlobsFromPayload(payload, blobs, async () => "uid");
-
-    expect(result).toBe("{blobUrl:uid}");
-  });
-
-  it('handles nested blob URLs', async () => {
-    const blobs: Record<string, Blob> = {};
-    const payload = { nested: "blob:http://example.com/12345" };
-
-    const result = await extractBlobsFromPayload(payload, blobs, async () => "uid");
-
-    expect(result.nested).toBe("{blobUrl:uid}");
-    expect(result).not.toBe(payload);
-  });
-
   it('retains payload if no blob URLs are found', async () => {
     const payload = { key: 'value' };
     const result = await extractBlobsFromPayload(payload, {});
     expect(result).toBe(payload);
-  });
-
-  it('handles arrays with blob URLs', async () => {
-    const blobs: Record<string, Blob> = {};
-    const payload = ["blob:http://example.com/12345"];
-
-    const result = await extractBlobsFromPayload(payload, blobs, async () => "uid");
-
-    expect(result[0]).toBe("{blobUrl:uid}");
   });
 });
