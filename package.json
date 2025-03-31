@@ -48,6 +48,7 @@
     "@dobuki/dev-dependencies": "^1.0.20"
   },
   "dependencies": {
-    "@dobuki/payload-validator": "^1.0.8"
+    "@dobuki/payload-validator": "^1.0.8",
+    "uuid": "^11.1.0"
   }
 }

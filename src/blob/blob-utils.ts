@@ -1,5 +1,6 @@
 import { validatePayload } from "@dobuki/payload-validator";
 import { PayloadType } from "./payload-enum";
+import { v4 as uuidv4 } from 'uuid';
 
 const DECODER = new TextDecoder();
 
@@ -70,18 +71,17 @@ export async function extractPayload<T extends Record<string, any>>(blob: Blob):
 
 export function extractBlobsFromPayload(
   payload: any,
-  blobs: Record<string, Blob>,
-  generateUid: () => string = crypto.randomUUID,
+  blobs: Record<string, Blob>
 ): any {
   if (typeof payload === "object" && payload instanceof Blob) {
-    const uid = `{blob:${generateUid()}}`;
+    const uid = `{blob:${uuidv4()}}`;
     blobs[uid] = payload;
     return uid;
   }
   const prePayload = payload;
   if (Array.isArray(payload)) {
     payload.forEach((value, index) => {
-      const newValue = extractBlobsFromPayload(value, blobs, generateUid);
+      const newValue = extractBlobsFromPayload(value, blobs);
       if (newValue !== payload[index]) {
         if (payload === prePayload) {
           payload = [...payload];
@@ -91,7 +91,7 @@ export function extractBlobsFromPayload(
     });
   } else if (typeof payload === "object" && payload) {
     Object.entries(payload).forEach(([key, value]) => {
-      const newValue = extractBlobsFromPayload(value, blobs, generateUid);
+      const newValue = extractBlobsFromPayload(value, blobs);
       if (newValue !== payload[key]) {
         if (payload === prePayload) {
           payload = { ...payload };
